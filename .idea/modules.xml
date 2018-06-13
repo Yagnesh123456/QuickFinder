@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Exploring_Places.iml" filepath="$PROJECT_DIR$/Exploring_Places.iml" />
+      <module fileurl="file://$PROJECT_DIR$/QuickFinder.iml" filepath="$PROJECT_DIR$/QuickFinder.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
