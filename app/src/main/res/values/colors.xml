@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#BB77AA</color>
+   <color name="colorPrimary_black">#BB77AA</color>
+    <color name="colorPrimaryDark">#BB77AA</color>
+    <color name="colorAccent">#BB77AA</color>
+    <color name="colorButton">#ea7e7e</color>
+    <color name="colorWhite">#fff</color>
+    <color name="website_blue">#61b3df</color>
+    <color name="text_color_white">#fffdfd</color>
+
+   <color name="rating_Color">#e4b565</color>
+
+
+    <color name="color_primary_text">#212121</color>
+
+    <color name="color_secondary_text">#757575</color>
+    <color name="color_divider">#BDBDBD</color>
+</resources>

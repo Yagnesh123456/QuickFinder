@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/plit_rootView"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginTop="16dp">
+
+    <ImageView
+        android:id="@+id/img_review"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:contentDescription="@string/location_icon"
+        android:src="@drawable/detailsmarker42"/>
+
+
+    <LinearLayout
+        android:id="@+id/location_detail_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/img_review"
+        android:layout_toRightOf="@id/img_review"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtreviewname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textColor="@color/color_primary_text"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="Axis Bank ATM"/>
+
+        <TextView
+            android:id="@+id/txtreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textColor="@color/color_secondary_text"
+            android:textSize="14sp"
+            tools:text="Mograwadi , Valsad - 396001"/>
+
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/location_detail_container"
+        android:layout_marginTop="16dp"
+        android:background="@color/color_divider"/>
+
+</RelativeLayout>

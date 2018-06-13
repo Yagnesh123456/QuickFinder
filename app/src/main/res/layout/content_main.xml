@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="10"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".MenuActivity"
+    tools:showIn="@layout/app_bar_main">
+
+    <RelativeLayout
+        android:id="@+id/relative_titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar4"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:contentInsetStart="0dp"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <Button
+                android:id="@+id/title_bar_left_menu"
+                android:layout_width="27dp"
+                android:layout_height="13dp"
+                android:layout_gravity="left|center_vertical"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/titlebar_menu_selector" />
+
+<!--            <android.support.v7.widget.SearchView
+                android:id="@+id/searchview"
+                android:layout_width="27dp"
+                android:layout_height="20dp"
+                android:gravity="center"
+                android:layout_marginLeft="10dp"
+                tools:ignore="RtlHardcoded">
+
+            </android.support.v7.widget.SearchView>-->
+
+
+           <!-- <Button
+                android:id="@+id/text_search"
+                android:layout_width="32dp"
+                android:layout_height="22dp"
+                android:layout_gravity="right|center_vertical"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/ic_search_white100" />
+-->
+
+        </android.support.v7.widget.Toolbar>
+
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/home_view_line"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/relative_titlebar"
+        android:background="#20233E" />
+
+
+    <FrameLayout
+        android:id="@+id/framlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ll_view"
+        android:layout_below="@id/home_view_line"
+        android:layout_gravity="top"
+        android:layout_weight="8"
+        android:orientation="vertical">
+
+    </FrameLayout>
+
+    <View
+        android:id="@+id/ll_view"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_above="@+id/ll_botom_bar"
+        android:background="@drawable/shadow">
+
+
+    </View>
+
+    <LinearLayout
+        android:id="@+id/ll_botom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:background="#20233E"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <TextView
+            android:id="@+id/img_home"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_home_purpul"
+            android:gravity="center"
+            android:text="Home"
+            android:textColor="@color/text_color_white" />
+
+        <TextView
+            android:id="@+id/voice_search"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_voice_search_grey"
+            android:gravity="center"
+            android:text="Search"
+            android:textColor="@color/text_color_white" />
+
+        <TextView
+            android:id="@+id/img_fav"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_favorite_grey"
+            android:gravity="center"
+            android:text="Favorite"
+            android:textColor="@color/text_color_white" />
+
+        <TextView
+            android:id="@+id/img_setting"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_setting_grey"
+            android:gravity="center"
+            android:text="Setting"
+            android:textColor="@color/text_color_white" />
+
+
+    </LinearLayout>
+
+</RelativeLayout>
+
+

@@ -1,0 +1,55 @@
+<resources>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <item name="android:typeface">monospace</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <!-- To change the popup menu and app text color  -->
+        <item name="android:textColor">@color/colorWhite</item>
+
+        <!-- To change the background of options menu-->
+        <item name="android:itemBackground">@drawable/gradient</item>
+
+
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+
+
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:statusBarColor">#00000000</item>
+
+        <!--<item name="android:statusBarColor">@color/colorAccent</item>-->
+
+        <!--<item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>-->
+
+        <item name="android:editTextColor">@android:color/white</item>   ///search view text color change
+
+        <item name="android:textColorHint">@android:color/white</item>  //search view hint color change
+
+
+
+    </style>
+    <style name="TextAppearance.Widget.ActionBar.Subtitle"
+        parent="@android:style/TextAppearance.Medium">
+    </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">#00000000</item>
+
+    </style>
+
+
+
+</resources>

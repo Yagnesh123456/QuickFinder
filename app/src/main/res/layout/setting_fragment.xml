@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="top|center"
+    android:background="@drawable/gradient"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtdistance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp">
+    </LinearLayout>
+
+
+    <com.warkiz.widget.IndicatorSeekBar
+        android:id="@+id/seekbar_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:isb_max="50"
+        app:isb_min="1"
+        app:isb_indicator_stay="true"
+        app:isb_indicator_color="#504747"
+        app:isb_track_background_bar_color="#504747"
+        app:isb_track_progress_bar_color="#504747"
+        app:isb_thumb_color="#504747"
+        app:isb_show_indicator="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp">
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtpriorityrates"
+            android:text="Priority"
+            android:textColor="@color/text_color_white"
+            android:layout_marginLeft="5dp"
+            android:textStyle="bold"/>
+
+        <Button
+            android:gravity="right"
+            android:id="@+id/btnpriority"
+            android:layout_marginLeft="210dp"
+            android:layout_width="wrap_content"
+            android:textAllCaps="false"
+            android:text="Rating >"
+            android:textColor="@color/text_color_white"
+            android:textAlignment="center"
+            android:background="#00f7f6f6"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/Banner_id"
+        android:layout_alignParentLeft="true">
+
+    </com.google.android.gms.ads.AdView>
+
+    </RelativeLayout>
+
+
+</LinearLayout>
