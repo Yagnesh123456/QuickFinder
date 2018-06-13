@@ -11,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="67dp"
-        android:text="Nothing  in Favourite "
+        android:text="No record Found"
         android:textColor="@color/colorWhite"
         android:visibility="invisible" />
 

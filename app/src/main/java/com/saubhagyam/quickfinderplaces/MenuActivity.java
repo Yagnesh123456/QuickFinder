@@ -423,7 +423,7 @@ public class MenuActivity extends AppCompatActivity
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("text/plain");
                 i.putExtra(Intent.EXTRA_SUBJECT, "My application name");
-                String sAux = "\nLet me recommend you this application\n\n";
+                String sAux = "\nLooking for nearest place like Cafe,Theatre,ATM,Bank,Bus,Bakery?-Checkout following amazing app which provides nearest places quickly on your mobile.\n\n Quick Finder ";
                 sAux = sAux + "https://play.google.com/store/apps/details?id=com.saubhagyam.quickfinderplaces\n\n";
                 i.putExtra(Intent.EXTRA_TEXT, sAux);
                 startActivity(Intent.createChooser(i, "choose one"));

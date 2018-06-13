@@ -55,9 +55,9 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceListAdapter.MyVi
     public void onBindViewHolder(final MyViewHolder holder, final int listPosition) {
 
 
-        Animation animation = AnimationUtils.loadAnimation(context, R.anim.slidein);
+        /*Animation animation = AnimationUtils.loadAnimation(context, R.anim.slidein);
         animation.setDuration(500);
-        holder.rootView.startAnimation(animation);
+        holder.rootView.startAnimation(animation);*/
 
         TextView textViewDistance = holder.txt_place_distance_text_view;
         TextView textViewPlaceName = holder.txt_place_name;
