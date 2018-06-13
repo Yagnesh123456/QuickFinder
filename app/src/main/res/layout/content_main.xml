@@ -24,11 +24,13 @@
 
             <Button
                 android:id="@+id/title_bar_left_menu"
-                android:layout_width="27dp"
-                android:layout_height="13dp"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
                 android:layout_gravity="left|center_vertical"
                 android:layout_marginLeft="10dp"
-                android:background="@drawable/titlebar_menu_selector" />
+                android:background="@drawable/ic_menu" />
+
+            <!--android:background="@drawable/titlebar_menu_selector"-->
 
 <!--            <android.support.v7.widget.SearchView
                 android:id="@+id/searchview"
