@@ -392,6 +392,7 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
                             databasePojo.setPlaceicon(getImage);
                             databasePojo.setRating(getRating);
                             databasePojo.setKm(dis);
+
                             databasePojo.setStatus(status);
                             DatabaseCreate.AppDatabase.getAppDatabase(getApplicationContext()).userDao().insertdata(databasePojo);
                         }
