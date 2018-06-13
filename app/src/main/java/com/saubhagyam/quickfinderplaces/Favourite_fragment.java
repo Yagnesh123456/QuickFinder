@@ -37,6 +37,8 @@ public class Favourite_fragment extends Fragment {
     private AdRequest adRequest;
     InterstitialAd interstitialAd;
 
+    TextView txtmsg;
+
 
 
     @Nullable
@@ -46,6 +48,8 @@ public class Favourite_fragment extends Fragment {
 
 
         listView = view.findViewById(R.id.listview);
+
+        txtmsg = view.findViewById(R.id.txtmsg);
 
         list = new ArrayList<>();
 
@@ -64,7 +68,8 @@ public class Favourite_fragment extends Fragment {
 
 
         if (list.size() == 0) {
-            Toast.makeText(getActivity(), "Nothing  in Favourite", Toast.LENGTH_LONG).show();
+            txtmsg.setVisibility(View.VISIBLE);
+           // Toast.makeText(getActivity(), "Nothing  in Favourite", Toast.LENGTH_LONG).show();
         }
 
         return view;

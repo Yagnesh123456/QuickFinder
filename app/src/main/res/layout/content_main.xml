@@ -122,7 +122,7 @@
             android:layout_weight="1"
             android:drawableTop="@drawable/ic_favorite_grey"
             android:gravity="center"
-            android:text="Favorite"
+            android:text="Favourite "
             android:textColor="@color/text_color_white" />
 
         <TextView
