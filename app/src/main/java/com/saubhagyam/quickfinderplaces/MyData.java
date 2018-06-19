@@ -7,7 +7,7 @@ package com.saubhagyam.quickfinderplaces;
  */
 
 public class MyData {
-    static String[] nameArray = {"ATM", "Bakery", "Bank", "Book Store", "Bus", "Cafe",
+    static String[] nameArray = {"ATM", "Bakery", "Bank", "Book Store", "Bus Stand", "Cafe",
             "Carwash", "Church","Cinema","Dentist", "Doctor",
             "Electrician", "Embassy", "Gym",
             "Hospital", "Insurance", "Laundry", "Mosque",

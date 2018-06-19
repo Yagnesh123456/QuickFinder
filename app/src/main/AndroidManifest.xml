@@ -34,16 +34,21 @@
 
         <activity
             android:name="com.saubhagyam.quickfinderplaces.MenuActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.saubhagyam.quickfinderplaces.Category_Activity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.saubhagyam.quickfinderplaces.Place_details"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name="com.saubhagyam.quickfinderplaces.Category_Activity_TextSearch"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
     </application>

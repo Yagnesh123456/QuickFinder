@@ -71,6 +71,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 
+import dmax.dialog.SpotsDialog;
+
 /**
  * Created by yagnesh on 19/03/18.
  */
@@ -116,12 +118,18 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
     String t_title;
     String jobjicon, name, dis, open_now, id, jobjadd, reting;
 
+    private AlertDialog progressDialog;
+
+    Handler handler;
+    Runnable finalizer;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.category_activity);
 
+        handler=new Handler();
         // create our manager instance after the content view is set
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         // enable status bar tint
@@ -129,9 +137,9 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
         // enable navigation bar tint
         tintManager.setNavigationBarTintEnabled(true);
 
-
+        progressDialog = new SpotsDialog(Category_Activity.this, R.style.Custom);
 // set a custom tint color for all system bars
-        tintManager.setTintColor(Color.parseColor("#BB77AA"));
+        tintManager.setTintColor(Color.parseColor("#E57200"));
 
 
         bundle = getIntent().getExtras();
@@ -190,8 +198,8 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
 
         mInterstitialAd.setAdListener(new AdListener() {
             public void onAdLoaded() {
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
+               handler = new Handler();
+                handler.postDelayed(finalizer = new Runnable() {
                     @Override
                     public void run() {
                         //Do something after 100ms
@@ -244,6 +252,21 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
     }
 
 
+   /* @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        handler.removeCallbacks(finalizer);
+    }*/
+
+/*    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        handler.removeCallbacks(finalizer);;
+    }*/
+
+
     private void displayLocationSettingsRequest(Context context) {
         GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(LocationServices.API).build();
@@ -291,6 +314,7 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
     public void onPause() {
         super.onPause();
 
+        handler.removeCallbacks(finalizer);
         //stop location updates when Activity is no longer active
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
@@ -337,6 +361,10 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
 
         System.out.println("You select This type --->" + type);
         Finalurl = getUrl(latitude, longitude, type);
+
+
+
+        System.out.println("Category Activity URL"+Finalurl);
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
@@ -475,11 +503,13 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
 
     public void getNearByPlace() {
 
-
+        progressDialog.show();
         mGoogleMap.clear();
-        final ProgressDialog progressDialog = new ProgressDialog(this);
+      /*  final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading...");
         progressDialog.show();
+*/
+
 
 
         //final String URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" + "location= " + latitude + ", " + longitude + " &radius= " + PROXIMATRY_RADIUS + " &type= " + NearByPlace + "&key=" + key;
@@ -494,6 +524,7 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
                     progressDialog.dismiss();
                     JSONObject jsonObject = new JSONObject(response);
                     JSONArray results = jsonObject.getJSONArray("results");
+
 
                     if (results.length() == 0) {
                         Toast.makeText(Category_Activity.this, "No Result Found", Toast.LENGTH_SHORT).show();
@@ -546,8 +577,12 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
                             pojo.setRating(reting);
                             pojo.setOpen_now(open_now.equals("true") ? "Open" : "Closed");
 
+                            //pojo.setPlace_id();
+
 
                             arr_list.add(pojo);
+
+
                         }
 
 
@@ -567,14 +602,21 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
 
 
                     }
-                    String lowpriority = sharedPreferences.getString("LowToHigh", null);
+
+                    //set data high ti low ratting priority
+
+ /*                   String lowpriority = sharedPreferences.getString("LowToHigh", null);
 
                     Collections.sort(arr_list, new CustomComparator());
                     Collections.reverse(arr_list);
                     if (lowpriority.length() != 0) {
                         Collections.sort(arr_list, new CustomComparator());
-                    }
+                    }*/
 
+
+                    //sort data by distance
+
+                    Collections.sort(arr_list, new CustomComparator());
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -629,7 +671,7 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
             StringBuilder sb = new StringBuilder("https://maps.googleapis.com/maps/api/place/textsearch/json?");
             sb.append("query=" + NearByPlace);
             sb.append("&location=" + latitude + "," + longitude);
-            sb.append("&radius=" + 10000);
+            sb.append("&radius=" + PROXIMATRY_RADIUS);
             sb.append("&key=" + key);
             Log.d("Map", "search place URL: " + sb.toString());
             return sb.toString();
@@ -638,16 +680,20 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
 
     }
 
-/*    @Override
-    public void onClick(View view) {
-        Toast.makeText(Category_Activity.this, "Detals Of Near BY", Toast.LENGTH_SHORT).show();
-    }*/
 
+//method of sorting ratting
+
+/*    public class CustomComparator implements Comparator<JSONPojo> {
+        @Override
+        public int compare(JSONPojo o1, JSONPojo o2) {
+            return o1.getRating().compareTo(o2.getRating());
+        }
+    }*/
 
     public class CustomComparator implements Comparator<JSONPojo> {
         @Override
         public int compare(JSONPojo o1, JSONPojo o2) {
-            return o1.getRating().compareTo(o2.getRating());
+            return o1.getDistance().compareTo(o2.getDistance());
         }
     }
 

@@ -30,6 +30,9 @@ public class DatabasePojo {
     @ColumnInfo(name = "status")
     private String status;
 
+    @ColumnInfo(name = "place_id")
+    private String place_id;
+
 
     public DatabasePojo() {
 
@@ -94,5 +97,13 @@ public class DatabasePojo {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getPlace_id() {
+        return place_id;
+    }
+
+    public void setPlace_id(String place_id) {
+        this.place_id = place_id;
     }
 }

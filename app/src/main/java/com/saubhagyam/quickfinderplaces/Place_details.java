@@ -1,6 +1,8 @@
 package com.saubhagyam.quickfinderplaces;
 
-import android.app.Fragment;
+
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -29,9 +31,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -48,7 +48,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,6 +56,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import dmax.dialog.SpotsDialog;
 
 /**
  * Created by yagnesh on 24/03/18.
@@ -65,67 +67,63 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
-
     boolean showingFirst = true;
-
-    private AdView adView;
-    private AdRequest adRequest;
-    InterstitialAd interstitialAd;
-
     String place_id;
     String key = "AIzaSyDQxEF-rUWRvcJsiM-gRLWJHnsQDt8o9Rk";
     String Finalurl = "";
     String website;
     String formatted_phone_number;
-
-
     Toolbar toolbar;
     TextView txt_tool;
-
     GoogleMap mGoogleMap;
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     Marker mCurrLocationMarker;
-
     DatabasePojo databasePojo;
-
     Double latitude;
     Double longitude;
-
     LatLng latLng;
-
     double getlet;
     double getlong;
     String dis;
-
-
     String name;
     String formatted_address;
     String getImage;
     String getRating;
     String status;
-    String review, review_name, review_img;
-
-
     LinearLayoutManager manager;
     ArrayList<JSONPojo> arr_list;
     Review_Adapter review_adapter;
     RecyclerView recyclerView;
-
     boolean isZoomSet = false;
-
-    Fragment fragment = null;
-
-
-    ImageView location_phone_icon, location_website_icon, location_favourite_icon;
+    ImageView location_phone_icon, location_website_icon, location_favourite_icon,small_location_icon,small_phone_icon,small_website_icon,small_location_status_icon,small_location_distance_icon;
     TextView location_address_text_view, location_phone_number_text_view, location_website_text_view, location_status_text_view, location_distance_text_view;
+    private AlertDialog progressDialog;
+
+    DatabaseHandler db;
+    Handler handler;
+    Runnable finalizer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.place_detail_layout);
+
+        handler = new Handler();
+
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        // enable status bar tint
+        tintManager.setStatusBarTintEnabled(true);
+        // enable navigation bar tint
+        tintManager.setNavigationBarTintEnabled(true);
+
+        // set a custom tint color for all system bars
+
+        tintManager.setTintColor(Color.parseColor("#E57200"));
         recyclerView = findViewById(R.id.rv_reviewdata);
+
+        progressDialog = new SpotsDialog(Place_details.this, R.style.Custom);
 
         toolbar = findViewById(R.id.toolbar_placedetails);
         setSupportActionBar(toolbar);
@@ -133,6 +131,9 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         //  getSupportActionBar().setDisplayShowHomeEnabled(true);
         txt_tool = toolbar.findViewById(R.id.toolbar_title_placedetails);
+
+
+        db=new DatabaseHandler(this);
 
      /*   adView=findViewById(R.id.adView);
 
@@ -162,8 +163,8 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
 
         mInterstitialAd.setAdListener(new AdListener() {
             public void onAdLoaded() {
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
+                handler = new Handler();
+                handler.postDelayed(finalizer = new Runnable() {
                     @Override
                     public void run() {
                         //Do something after 100ms
@@ -195,14 +196,26 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
         location_status_text_view = findViewById(R.id.location_status_text_view);
         location_distance_text_view = findViewById(R.id.location_distance_text_view);
 
+
+        small_location_icon = findViewById(R.id.small_location_icon);
+        small_phone_icon = findViewById(R.id.small_phone_icon);
+        small_website_icon = findViewById(R.id.small_website_icon);
+        small_location_status_icon = findViewById(R.id.small_location_status_icon);
+        small_location_distance_icon = findViewById(R.id.small_location_distance_icon);
+
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.details_map);
         mapFragment.getMapAsync(this);
 
+        try {
+            place_id = getIntent().getStringExtra("placeID");
+            getImage = getIntent().getStringExtra("imagesend");
+            getRating = getIntent().getStringExtra("ratingsend");
+
+        } catch (Exception e) {
+
+        }
 
 
-        place_id = getIntent().getStringExtra("placeID");
-        getImage = getIntent().getStringExtra("imagesend");
-        getRating = getIntent().getStringExtra("ratingsend");
         Finalurl = getUrl();
 
         System.out.println("Review Data URL" + Finalurl);
@@ -212,8 +225,39 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
         location_favourite_icon.setOnClickListener(this);
 
 
+        for (int i=0;i<db.getdata().size();i++)
+        {
+            System.out.println("Place Id Print " +db.getdata().get(i).getUplaceid());
+
+            if (db.getdata().get(i).getUplaceid().equals(place_id))
+            {
+                location_favourite_icon.setImageResource(R.drawable.ic_fav_imageasset_black);
+            }
+        }
+
+
+
 
     }
+
+    protected void onPause(){
+        super.onPause();
+        handler.removeCallbacks(finalizer);
+    }
+
+/*    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        handler.removeCallbacks(finalizer);
+    }*/
+
+/*    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        handler.removeCallbacks(finalizer);;
+    }*/
 
     public String getUrl() {
 
@@ -226,19 +270,37 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        progressDialog = new SpotsDialog(Place_details.this, R.style.Custom);
+        Log.e("TAG", "onStart: " );
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        progressDialog = new SpotsDialog(Place_details.this, R.style.Custom);
+        Log.e("TAG", "onResume: " );
+    }
+
     public void getDetailOfPlace() {
 
 /*        final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading...");
         progressDialog.show();*/
 
+        if(!(Place_details.this).isFinishing())
+        {
+            progressDialog.show();
+        }
 
         //final String URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" + "location= " + latitude + ", " + longitude + " &radius= " + PROXIMATRY_RADIUS + " &type= " + NearByPlace + "&key=" + key;
         final StringRequest request = new StringRequest(Request.Method.GET, Finalurl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
-
+                progressDialog.dismiss();
                 //JSONObject jsonObject = null;
                 try {
                     JSONObject jsonObject = new JSONObject(response);
@@ -250,15 +312,22 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
                     String selected_lat = selectedlocation.getString("lat");
                     String selected_lng = selectedlocation.getString("lng");
 
-                    JSONArray review_arry = result.getJSONArray("reviews");
-                    review_adapter = new Review_Adapter(Place_details.this, review_arry);
 
-                    review_adapter.notifyDataSetChanged();
+                    try {
+                        JSONArray review_arry = result.getJSONArray("reviews");
+                        review_adapter = new Review_Adapter(Place_details.this, review_arry);
 
-                    recyclerView.setAdapter(review_adapter);
+                        review_adapter.notifyDataSetChanged();
 
-                    Log.e("SIZE", arr_list.size() + "");
-                    // review = review_arry.getString();
+                        recyclerView.setAdapter(review_adapter);
+
+                        Log.e("SIZE", arr_list.size() + "");
+                        // review = review_arry.getString();
+
+                    } catch (Exception e) {
+
+                        e.printStackTrace();
+                    }
 
 
                     name = result.getString("name");
@@ -271,12 +340,12 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
                     getlet = Double.parseDouble(selected_lat);
                     getlong = Double.parseDouble(selected_lng);
 
-                    BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_purpul_icon64);
+                    BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_imageasset_orange);
                     mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(getlet, getlong)).icon(icon));
 
 
                     //    mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(14), 3000, null);
-                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(getlet, getlong), 11));
+                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(getlet, getlong), 13));
 
 
                     website = result.has("website") ? result.getString("website") : " ";
@@ -287,29 +356,8 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
                         open_now = opening_hours.getString("open_now");
                     }
 
+
                     status = open_now.equals("true") ? "Open" : "Closed";
-
-                    location_status_text_view.setText(status);
-                    location_address_text_view.setText(formatted_address);
-                    location_website_text_view.setText(website);
-                    // Linkify.addLinks(location_website_text_view, Linkify.WEB_URLS);
-                    location_phone_number_text_view.setText(formatted_phone_number);
-                    //Linkify.addLinks(location_phone_number_text_view, Linkify.PHONE_NUMBERS);
-
-/*                    GMapV2Direction md = new GMapV2Direction();
-                    Document doc = md.getDocument(latitude,longitude,getlet,getlong,
-                            GMapV2Direction.MODE_DRIVING);
-
-                    ArrayList<LatLng> directionPoint = md.getDirection(doc);
-                    PolylineOptions rectLine = new PolylineOptions().width(3).color(
-                            Color.RED);
-
-                    for (int i = 0; i < directionPoint.size(); i++) {
-                        rectLine.add(directionPoint.get(i));
-                    }
-                    Polyline polylin = mGoogleMap.addPolyline(rectLine);
-                    polylin.isVisible();*/
-
 
                     PolylineOptions polylineOptions = new PolylineOptions()
                             .add(new LatLng(latitude, longitude))
@@ -331,8 +379,50 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
 
                     float distance = locationA.distanceTo(locationB) / 1000;
                     dis = String.format("%.01f", distance);
+
+
+
+
+                    location_address_text_view.setText(formatted_address);
+                    if (location_address_text_view.getText().toString()==null || location_address_text_view.getText().toString().isEmpty())
+                    {
+                        small_location_icon.setVisibility(View.GONE);
+                        location_address_text_view.setVisibility(View.GONE);
+                    }
+
+                    location_phone_number_text_view.setText(formatted_phone_number);
+
+                    if (location_phone_number_text_view.getText().toString()==null || location_phone_number_text_view.getText().toString().isEmpty())
+                    {
+                        small_phone_icon.setVisibility(View.GONE);
+                        location_phone_number_text_view.setVisibility(View.GONE);
+                    }
+                    location_website_text_view.setText(website);
+                    String mwebSite=location_website_text_view.getText().toString().trim();
+                    Log.e("TAG", "WebSite"+mwebSite );
+                    if (mwebSite.equals("")||mwebSite.equals(" "))
+                    {
+                        Log.e("Tag", "done");
+                        small_website_icon.setVisibility(View.GONE);
+                        location_website_text_view.setVisibility(View.GONE);
+                    }
+
+                    location_status_text_view.setText(status);
+
+                    if (location_status_text_view.getText().toString()==null || location_status_text_view.getText().toString().isEmpty())
+
+                    {
+                        small_location_status_icon.setVisibility(View.GONE);
+                        location_status_text_view.setVisibility(View.GONE);
+                    }
+
                     location_distance_text_view.setText(dis + " Km");
 
+                    if (location_distance_text_view.getText().toString()==null || location_distance_text_view.getText().toString().isEmpty())
+                    {
+                        small_location_distance_icon.setVisibility(View.GONE);
+                        location_distance_text_view.setVisibility(View.GONE);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -342,7 +432,7 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                progressDialog.dismiss();
                 //progressDialog.dismiss();
 
             }
@@ -372,7 +462,7 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
             }
 
             case R.id.location_phone_icon: {
-              //  Toast.makeText(getApplicationContext(), "Phone" + formatted_phone_number, Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(getApplicationContext(), "Phone" + formatted_phone_number, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Intent.ACTION_DIAL);
                 intent.setData(Uri.parse("tel:" + formatted_phone_number));
                 startActivity(intent);
@@ -381,33 +471,48 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
             case R.id.location_favourite_icon: {
                 databasePojo = new DatabasePojo();
 
-                if(showingFirst == true){
-                    location_favourite_icon.setImageResource(R.drawable.favourite_detailsdark);
+                if (showingFirst == true) {
+                    location_favourite_icon.setImageResource(R.drawable.ic_fav_imageasset_black);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                           // databasePojo = new DatabasePojo();
+
+
+                           db.insertData(new Contact_Databse_pojo(name,place_id,formatted_address,status,getRating,dis));
+                           /* // databasePojo = new DatabasePojo();
                             databasePojo.setPlacename(name);
                             databasePojo.setAddress(formatted_address);
                             databasePojo.setPlaceicon(getImage);
                             databasePojo.setRating(getRating);
                             databasePojo.setKm(dis);
+                            databasePojo.setPlace_id(place_id);
 
                             databasePojo.setStatus(status);
                             DatabaseCreate.AppDatabase.getAppDatabase(getApplicationContext()).userDao().insertdata(databasePojo);
+*/
+
                         }
                     }).start();
                     showingFirst = false;
-                }else{
+                } else {
                     location_favourite_icon.setImageResource(R.drawable.favourite_details_white);
+/*                    int possition = Integer.parseInt(arr_list.get(1).getId());
 
-                    DatabaseCreate.AppDatabase.getAppDatabase(this).userDao().delete(databasePojo);
+                    db.deleteData(arr_list.get(possition).getId());*/
+
+                        db.deleteData(place_id);
+
+
+                   // System.out.println("Place ID-->" + arr_list.get(1).getId());
+
+
+                   // DatabaseCreate.AppDatabase.getAppDatabase(this).userDao().delete(databasePojo);
                     showingFirst = true;
                 }
               /*  location_favourite_icon.setImageResource(R.drawable.favourite_detailsdark);
 
                 location_favourite_icon.setEnabled(false);*/
-               // Toast.makeText(Place_details.this, "Data added to Favourate", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(Place_details.this, "Data added to Favourate", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -450,7 +555,7 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         getDetailOfPlace();
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_pink_icon64);
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_imageasset_black);
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
@@ -489,7 +594,6 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
             buildGoogleApiClient();
             mGoogleMap.setMyLocationEnabled(true);
         }
-
 
 
     }

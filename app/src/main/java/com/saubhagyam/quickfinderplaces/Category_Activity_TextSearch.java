@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,6 +44,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 
 import org.json.JSONArray;
@@ -50,7 +52,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
+
+import dmax.dialog.SpotsDialog;
 
 /**
  * Created by yagnesh on 19/03/18.
@@ -82,6 +88,9 @@ public class Category_Activity_TextSearch extends AppCompatActivity implements O
     TextView txt_tool;
     String NearByPlace = "";
 
+    Handler handler;
+    Runnable finalizer;
+
     //String textsearch;
     View place_list_view;
     ArrayList<JSONPojo> arr_list;
@@ -94,6 +103,17 @@ public class Category_Activity_TextSearch extends AppCompatActivity implements O
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.category_activity_textsearch);
+
+        // create our manager instance after the content view is set
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        // enable status bar tint
+        tintManager.setStatusBarTintEnabled(true);
+        // enable navigation bar tint
+        tintManager.setNavigationBarTintEnabled(true);
+
+// set a custom tint color for all system bars
+        tintManager.setTintColor(Color.parseColor("#E57200"));
+
 
         bundle = getIntent().getExtras();
 
@@ -145,7 +165,7 @@ public class Category_Activity_TextSearch extends AppCompatActivity implements O
         mInterstitialAd.setAdListener(new AdListener() {
             public void onAdLoaded() {
                 final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
+                handler.postDelayed(finalizer = new Runnable() {
                     @Override
                     public void run() {
                         //Do something after 100ms
@@ -192,8 +212,26 @@ public class Category_Activity_TextSearch extends AppCompatActivity implements O
 
     }
 
+
+
+/*    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        handler.removeCallbacks(finalizer);
+    }*/
+
+/*    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        handler.removeCallbacks(finalizer);;
+    }*/
+
+
     public void onPause() {
         super.onPause();
+        handler.removeCallbacks(finalizer);
 
         //stop location updates when Activity is no longer active
         if (mGoogleApiClient != null) {
@@ -448,6 +486,14 @@ public class Category_Activity_TextSearch extends AppCompatActivity implements O
                         //  mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lng),13));
                         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 12));
                     }
+
+                    Collections.sort(arr_list, new Comparator<JSONPojo>() {
+                        @Override
+                        public int compare(JSONPojo o1, JSONPojo o2) {
+                            return o1.getDistance().compareTo(o2.getDistance());
+                        }
+                        });
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -486,6 +532,14 @@ public class Category_Activity_TextSearch extends AppCompatActivity implements O
 
 
     }
+
+
+/*    public class CustomComparator implements Comparator<JSONPojo> {
+        @Override
+        public int compare(JSONPojo o1, JSONPojo o2) {
+            return o1.getDistance().compareTo(o2.getDistance());
+        }
+    }*/
 
 /*    @Override
     public void onClick(View view) {

@@ -1,5 +1,6 @@
 package com.saubhagyam.quickfinderplaces;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -20,16 +21,14 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -44,11 +43,13 @@ import java.util.ArrayList;
 public class MenuActivity extends AppCompatActivity
         implements View.OnClickListener {
 
+    private static final String TAG = "MenuActivity";
     Fragment fragment = null;
     TextView imghome, imgvoicesearch, imgfavorite, imgsetting;
     SearchView searchView;
     Toolbar toolbar;
-
+    Handler handler;
+    Runnable finalizer;
     private ResideMenu resideMenu;
     private MenuActivity mContext;
     private ResideMenuItem itemHome;
@@ -56,19 +57,18 @@ public class MenuActivity extends AppCompatActivity
     private ResideMenuItem itemFavorites;
     private ResideMenuItem itemSettings;
     private ResideMenuItem itemAbout;
-
     private ResideMenuItem itemShare;
     private ResideMenuItem itemRateUs;
     private ResideMenuItem itemExit;
     private ResideMenu.OnMenuListener menuListener = new ResideMenu.OnMenuListener() {
         @Override
         public void openMenu() {
-           // Toast.makeText(mContext, "Menu is opened!", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(mContext, "Menu is opened!", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void closeMenu() {
-           // Toast.makeText(mContext, "Menu is closed!", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(mContext, "Menu is closed!", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -95,6 +95,8 @@ public class MenuActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        handler = new Handler();
+
         // create our manager instance after the content view is set
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         // enable status bar tint
@@ -104,13 +106,7 @@ public class MenuActivity extends AppCompatActivity
 
 
 // set a custom tint color for all system bars
-        tintManager.setTintColor(Color.parseColor("#BB77AA"));
-
-     //   set a custom navigation bar resource
-     //   tintManager.setNavigationBarTintResource(R.drawable.gradient);
-
-// set a custom status bar drawable
-       // tintManager.setStatusBarTintDrawable(android.R.color.background_dark);
+        tintManager.setTintColor(Color.parseColor("#E57200"));
 
 
         toolbar = (Toolbar) findViewById(R.id.toolbar4);
@@ -133,8 +129,8 @@ public class MenuActivity extends AppCompatActivity
 
         mInterstitialAd.setAdListener(new AdListener() {
             public void onAdLoaded() {
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
+
+                handler.postDelayed(finalizer = new Runnable() {
                     @Override
                     public void run() {
                         //Do something after 100ms
@@ -151,7 +147,7 @@ public class MenuActivity extends AppCompatActivity
 
         //hide system functinality
 
-       hideSystemUI();
+        hideSystemUI();
 
         //Code for Status bar
 
@@ -160,7 +156,7 @@ public class MenuActivity extends AppCompatActivity
             w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         }*/
 
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE );
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 
 
         mContext = this;
@@ -185,6 +181,34 @@ public class MenuActivity extends AppCompatActivity
 
 
     }
+
+    protected void onPause() {
+        super.onPause();
+        handler.removeCallbacks(finalizer);
+        Log.e(TAG, "onPause: " );
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("TAG", "onDestroy: ");
+
+
+    }
+    /*    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        handler.removeCallbacks(finalizer);
+    }*/
+
+/*    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        handler.removeCallbacks(finalizer);;
+    }*/
+
 
     private void setUpMenu() {
 
@@ -263,6 +287,10 @@ public class MenuActivity extends AppCompatActivity
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchItem.collapseActionView();
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{android.Manifest.permission.INTERNET, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CALL_PHONE}, 100);
+        }
+
         // menu.getItem(0).setIcon(R.drawable.ic_favorites_white);
 
         SearchView searchView = (SearchView) searchItem.getActionView();
@@ -317,7 +345,7 @@ public class MenuActivity extends AppCompatActivity
                                                       return false;
                                                   }
                                               }*/
-           // Toast.makeText(this, "Search", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "Search", Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -356,10 +384,10 @@ public class MenuActivity extends AppCompatActivity
             fragment = new Home_Fragment();
 
 
-            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_purpul), null, null);
-            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_search_grey1), null, null);
-            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_favorite_grey), null, null);
-            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_grey), null, null);
+            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_imageasset_black), null, null);
+            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_imageasset_orange), null, null);
+            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_fav_imageasset_orange), null, null);
+            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_imageasset_orange), null, null);
 
 
         } else if (view == itemLocation) {
@@ -367,10 +395,10 @@ public class MenuActivity extends AppCompatActivity
             fragment = new Location_Fragment();
 
             //Toast.makeText(this, "My Location", Toast.LENGTH_SHORT).show();
-            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_grey), null, null);
-            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_search_grey1), null, null);
-            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_favorite_grey), null, null);
-            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_grey), null, null);
+            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_imageasset_orange), null, null);
+            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_imageasset_orange), null, null);
+            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_fav_imageasset_orange), null, null);
+            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_imageasset_orange), null, null);
 
 
         } else if (view == itemFavorites) {
@@ -381,10 +409,10 @@ public class MenuActivity extends AppCompatActivity
             transaction.commit();
 
             //Toast.makeText(this, "Favorite", Toast.LENGTH_SHORT).show();
-            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_grey), null, null);
-            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_search_grey1), null, null);
-            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_favorite_purpul), null, null);
-            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_grey), null, null);
+            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_imageasset_orange), null, null);
+            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_imageasset_orange), null, null);
+            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_fav_imageasset_black), null, null);
+            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_imageasset_orange), null, null);
 
 
         } else if (view == itemSettings) {
@@ -396,15 +424,15 @@ public class MenuActivity extends AppCompatActivity
             transaction.replace(R.id.framlayout, fragment);
             transaction.commit();
 
-            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_grey), null, null);
-            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_search_grey1), null, null);
-            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_favorite_grey), null, null);
-            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_purpul), null, null);
+            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_imageasset_orange), null, null);
+            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_imageasset_orange), null, null);
+            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_fav_imageasset_orange), null, null);
+            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_imageasset_black), null, null);
 
 
         } /*else if (view == itemAbout) {
 
-          *//*  fragment = new About_Fragment();
+         *//*  fragment = new About_Fragment();
             FragmentManager manager = getFragmentManager();
             FragmentTransaction transaction = manager.beginTransaction();
             transaction.replace(R.id.framlayout, fragment);
@@ -431,10 +459,10 @@ public class MenuActivity extends AppCompatActivity
                 //e.toString();
             }
 
-            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_grey), null, null);
-            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_search_grey1), null, null);
-            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_favorite_grey), null, null);
-            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_grey), null, null);
+            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_imageasset_orange), null, null);
+            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_imageasset_orange), null, null);
+            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_fav_imageasset_orange), null, null);
+            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_imageasset_orange), null, null);
 
 
         } else if (view == itemRateUs) {
@@ -452,11 +480,10 @@ public class MenuActivity extends AppCompatActivity
                 startActivity(new Intent(Intent.ACTION_VIEW,
                         Uri.parse("http://play.google.com/store/apps/details?id=com.saubhagyam.quickfinderplaces" + MenuActivity.this.getPackageName())));
             }
-            //Toast.makeText(this, "Rate Us", Toast.LENGTH_SHORT).show();
-            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_grey), null, null);
-            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_search_grey1), null, null);
-            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_favorite_grey), null, null);
-            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_grey), null, null);
+            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_imageasset_orange), null, null);
+            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_imageasset_orange), null, null);
+            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_fav_imageasset_orange), null, null);
+            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_imageasset_orange), null, null);
 
 
         } else if (view == itemExit) {
@@ -470,10 +497,10 @@ public class MenuActivity extends AppCompatActivity
             transaction.replace(R.id.framlayout, fragment);
             transaction.commit();
 
-            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_purpul), null, null);
-            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_search_grey1), null, null);
-            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_favorite_grey), null, null);
-            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_grey), null, null);
+            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_imageasset_black), null, null);
+            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_imageasset_orange), null, null);
+            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_fav_imageasset_orange), null, null);
+            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_imageasset_orange), null, null);
 
 
         } else if (view == imgvoicesearch) {
@@ -487,10 +514,10 @@ public class MenuActivity extends AppCompatActivity
             startActivityForResult(intent, RECOGNIZER_REQ_CODE);
 
 
-            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_grey), null, null);
-            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_search_purpul), null, null);
-            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_favorite_grey), null, null);
-            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_grey), null, null);
+            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_imageasset_orange), null, null);
+            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_imageasset_black), null, null);
+            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_fav_imageasset_orange), null, null);
+            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_imageasset_orange), null, null);
         } else if (view == imgfavorite) {
 
             fragment = new Favourite_fragment();
@@ -499,12 +526,12 @@ public class MenuActivity extends AppCompatActivity
             transaction.replace(R.id.framlayout, fragment);
             transaction.commit();
 
-           // Toast.makeText(this, "Favorite", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "Favorite", Toast.LENGTH_SHORT).show();
 
-            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_grey), null, null);
-            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_search_grey1), null, null);
-            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_favorite_purpul), null, null);
-            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_grey), null, null);
+            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_imageasset_orange), null, null);
+            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_imageasset_orange), null, null);
+            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_fav_imageasset_black), null, null);
+            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_imageasset_orange), null, null);
 
 
         } else if (view == imgsetting) {
@@ -514,12 +541,12 @@ public class MenuActivity extends AppCompatActivity
             FragmentTransaction transaction = manager.beginTransaction();
             transaction.replace(R.id.framlayout, fragment);
             transaction.commit();
-           // Toast.makeText(this, "Setting", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "Setting", Toast.LENGTH_SHORT).show();
 
-            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_grey), null, null);
-            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_search_grey1), null, null);
-            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_favorite_grey), null, null);
-            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_purpul), null, null);
+            imghome.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_home_imageasset_orange), null, null);
+            imgvoicesearch.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_voice_imageasset_orange), null, null);
+            imgfavorite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_fav_imageasset_orange), null, null);
+            imgsetting.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_setting_imageasset_black), null, null);
         }
 
 

@@ -30,7 +30,7 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceListAdapter.MyVi
     String placeid;
     //public static String range="range";
     SharedPreferences sharedPreferences;
-    String hightolow, lowtohigh;
+   /* String hightolow, lowtohigh;*/
     String data;
 
     public PlaceListAdapter(Context context, ArrayList<JSONPojo> data) {
@@ -86,6 +86,7 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceListAdapter.MyVi
         textViewPlaceName.setText(dataSet.get(listPosition).getName());
         textViewPlaceAddress.setText(dataSet.get(listPosition).getVicinity());
         textViewOpenStatus.setText(dataSet.get(listPosition).getOpen_now());
+
         Rat_bar.setRating(Float.parseFloat(dataSet.get(listPosition).getRating()));
 
 
@@ -116,10 +117,10 @@ public class PlaceListAdapter extends RecyclerView.Adapter<PlaceListAdapter.MyVi
             place_rating = itemView.findViewById(R.id.place_rating);
             rootView = itemView.findViewById(R.id.plit_rootView);
 
-            sharedPreferences = context.getSharedPreferences(dbkey, Context.MODE_PRIVATE);
+/*            sharedPreferences = context.getSharedPreferences(dbkey, Context.MODE_PRIVATE);
 
             hightolow = sharedPreferences.getString("HighToLow", null);
-            lowtohigh = sharedPreferences.getString("LowToHigh", null);
+            lowtohigh = sharedPreferences.getString("LowToHigh", null);*/
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

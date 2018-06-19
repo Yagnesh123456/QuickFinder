@@ -131,7 +131,7 @@ public class Location_Fragment extends Fragment implements OnMapReadyCallback,
         System.out.println("lat--------------->" + latitude);
         System.out.println("long---------------->" + longitude);
 
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_pink_icon64);
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_imageasset_black);
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);

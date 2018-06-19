@@ -97,7 +97,7 @@ public class Review_Adapter extends RecyclerView.Adapter<Review_Adapter.MyViewHo
         return array.length();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
 
         TextView txt_review, txt_reviewname;
         ImageView img_review;

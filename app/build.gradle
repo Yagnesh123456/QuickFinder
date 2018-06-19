@@ -7,7 +7,7 @@ android {
         applicationId "com.saubhagyam.quickfinderplaces"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 3
+        versionCode 5
         versionName "2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -75,9 +75,9 @@ dependencies {
 
     implementation 'com.readystatesoftware.systembartint:systembartint:1.0.3'
 
+    implementation 'com.github.jd-alexander:library:1.1.0'
 
-
-
+    implementation 'com.github.d-max:spots-dialog:0.4@aar'
 
 
 }

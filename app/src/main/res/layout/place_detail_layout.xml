@@ -7,6 +7,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbarlayout"
         android:layout_width="match_parent"
@@ -16,7 +22,7 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_placedetails"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="?attr/actionBarSize"
             android:layout_gravity="center"
             android:gravity="center"
             app:contentInsetStart="0dp"
@@ -53,8 +59,7 @@
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary_black"
             android:baselineAligned="false"
-            android:orientation="horizontal"
-            android:padding="16dp">
+            android:orientation="horizontal">
 
 
             <LinearLayout
@@ -67,7 +72,7 @@
                 <ImageView
                     android:id="@+id/location_phone_icon"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="30dp"
                     android:contentDescription="@string/phone_icon"
                     android:src="@drawable/ic_call_white" />
 
@@ -94,7 +99,7 @@
                 <ImageView
                     android:id="@+id/location_website_icon"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="30dp"
                     android:contentDescription="@string/website_icon"
                     android:src="@drawable/ic_public_white" />
 
@@ -123,7 +128,7 @@
                 <ImageView
                     android:id="@+id/location_favourite_icon"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="30dp"
                     android:contentDescription="@string/favourite_icon"
                     android:src="@drawable/favourite_details_white" />
 
@@ -141,15 +146,22 @@
             </LinearLayout>
         </LinearLayout>
 
+
+
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="150dp"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
             android:layout_marginTop="4dp"
             android:elevation="2dp">
 
-            <RelativeLayout
+            <include
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                layout="@layout/address" />
+
+           <!-- <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp">
@@ -186,6 +198,7 @@
                     android:layout_below="@id/location_address_text_view"
                     android:contentDescription="@string/small_call_icon"
                     android:padding="8dp"
+                    android:visibility="visible"
                     android:scaleType="centerCrop"
                     android:src="@drawable/detailsphone42" />
 
@@ -214,6 +227,7 @@
                     android:layout_below="@id/location_phone_number_text_view"
                     android:contentDescription="@string/small_website_icon"
                     android:padding="8dp"
+                    android:visibility="visible"
                     android:src="@drawable/detailswebsite42" />
 
                 <TextView
@@ -226,11 +240,9 @@
                     android:layout_marginTop="8dp"
                     android:layout_toEndOf="@id/small_website_icon"
                     android:layout_toRightOf="@id/small_website_icon"
-                    android:clickable="true"
                     android:maxLines="1"
                     android:textColor="@color/color_primary_text"
-                    android:textSize="16sp"
-                    tools:text="www.chandansharma.me" />
+                    android:textSize="16sp"/>
 
                 <ImageView
                     android:id="@+id/small_location_status_icon"
@@ -284,7 +296,7 @@
                     android:textColor="@color/color_primary_text"
                     android:textSize="16sp"
                     tools:text="2.0 km" />
-              <!--  <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+              &lt;!&ndash;  <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/adView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -295,10 +307,14 @@
                     android:layout_alignParentLeft="true">
 
                 </com.google.android.gms.ads.AdView>
--->
-            </RelativeLayout>
+&ndash;&gt;
+            </RelativeLayout>-->
+
+
         </android.support.v7.widget.CardView>
 
+
+    </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -312,7 +328,9 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_reviewdata"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
+            android:layout_height="wrap_content">
+
+        </android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

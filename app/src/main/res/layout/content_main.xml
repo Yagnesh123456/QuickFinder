@@ -92,7 +92,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
-        android:background="#20233E"
+        android:background="#ffffff"
         android:gravity="center"
         android:orientation="horizontal"
         android:weightSum="4">
@@ -102,40 +102,40 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:drawableTop="@drawable/ic_home_purpul"
+            android:drawableTop="@drawable/ic_home_imageasset_black"
             android:gravity="center"
             android:text="Home"
-            android:textColor="@color/text_color_white" />
+            android:textColor="#000" />
 
         <TextView
             android:id="@+id/voice_search"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:drawableTop="@drawable/ic_voice_search_grey"
+            android:drawableTop="@drawable/ic_voice_imageasset_orange"
             android:gravity="center"
             android:text="Search"
-            android:textColor="@color/text_color_white" />
+            android:textColor="#000" />
 
         <TextView
             android:id="@+id/img_fav"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:drawableTop="@drawable/ic_favorite_grey"
+            android:drawableTop="@drawable/ic_fav_imageasset_orange"
             android:gravity="center"
             android:text="Favourite "
-            android:textColor="@color/text_color_white" />
+            android:textColor="#000" />
 
         <TextView
             android:id="@+id/img_setting"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:drawableTop="@drawable/ic_setting_grey"
+            android:drawableTop="@drawable/ic_setting_imageasset_orange"
             android:gravity="center"
             android:text="Setting"
-            android:textColor="@color/text_color_white" />
+            android:textColor="#000" />
 
 
     </LinearLayout>
