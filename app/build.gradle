@@ -79,5 +79,12 @@ dependencies {
 
     implementation 'com.github.d-max:spots-dialog:0.4@aar'
 
+    implementation 'org.slf4j:slf4j-nop:1.7.25'
+
+    // butter knife
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+
 
 }

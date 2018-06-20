@@ -3,16 +3,19 @@ package com.saubhagyam.quickfinderplaces;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,7 +23,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,10 +58,27 @@ import com.readystatesoftware.systembartint.SystemBarTintManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import dmax.dialog.SpotsDialog;
 
 /**
@@ -67,6 +89,16 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
+
+    @BindView(R.id.btn_bottom_sheet)
+    Button btnBottomSheet;
+
+    @BindView(R.id.linearbottomsheet)
+    LinearLayout layoutBottomSheet;
+
+    BottomSheetBehavior sheetBehavior;
+
+
     boolean showingFirst = true;
     String place_id;
     String key = "AIzaSyDQxEF-rUWRvcJsiM-gRLWJHnsQDt8o9Rk";
@@ -96,10 +128,13 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
     ArrayList<JSONPojo> arr_list;
     Review_Adapter review_adapter;
     RecyclerView recyclerView;
-    boolean isZoomSet = false;
+    boolean isZoomSet = true;
+    public boolean firstTime = true;
     ImageView location_phone_icon, location_website_icon, location_favourite_icon,small_location_icon,small_phone_icon,small_website_icon,small_location_status_icon,small_location_distance_icon;
     TextView location_address_text_view, location_phone_number_text_view, location_website_text_view, location_status_text_view, location_distance_text_view;
     private AlertDialog progressDialog;
+
+    //Button btnreview;
 
     DatabaseHandler db;
     Handler handler;
@@ -109,6 +144,43 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.place_detail_layout);
+        ButterKnife.bind(this);
+
+        sheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
+
+        /**
+         * bottom sheet state change listener
+         * we are changing button text when sheet changed state
+         * */
+        sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED: {
+                        recyclerView.setVisibility(View.VISIBLE);
+                        btnBottomSheet.setText("Close");
+
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_COLLAPSED: {
+                        btnBottomSheet.setText("View Review");
+
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
 
         handler = new Handler();
 
@@ -132,15 +204,11 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
         //  getSupportActionBar().setDisplayShowHomeEnabled(true);
         txt_tool = toolbar.findViewById(R.id.toolbar_title_placedetails);
 
+       // btnreview = findViewById(R.id.btnreview);
+
 
         db=new DatabaseHandler(this);
 
-     /*   adView=findViewById(R.id.adView);
-
-        MobileAds.initialize(getApplicationContext(),"ca-app-pub-7796828333997958/4622009204");
-        adRequest=new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
-*/
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -240,6 +308,21 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
 
     }
 
+    /**
+     * manually opening / closing bottom sheet on button click
+     */
+    @OnClick(R.id.btn_bottom_sheet)
+    public void toggleBottomSheet() {
+        if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            btnBottomSheet.setText("Close");
+        } else {
+            sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            btnBottomSheet.setText("View Review");
+        }
+    }
+
+
     protected void onPause(){
         super.onPause();
         handler.removeCallbacks(finalizer);
@@ -283,6 +366,9 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
         progressDialog = new SpotsDialog(Place_details.this, R.style.Custom);
         Log.e("TAG", "onResume: " );
     }
+
+
+
 
     public void getDetailOfPlace() {
 
@@ -359,13 +445,18 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
 
                     status = open_now.equals("true") ? "Open" : "Closed";
 
-                    PolylineOptions polylineOptions = new PolylineOptions()
+/*                    PolylineOptions polylineOptions = new PolylineOptions()
                             .add(new LatLng(latitude, longitude))
                             .color(Color.BLUE)
                             .add(new LatLng(getlet, getlong));
 
                     Polyline polyline = mGoogleMap.addPolyline(polylineOptions);
-                    polyline.isVisible();
+                    polyline.isVisible();*/
+
+                    new connectAsyncTask().execute();
+
+
+
 
                     Location locationA = new Location("point A");
 
@@ -500,10 +591,9 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
 
                     db.deleteData(arr_list.get(possition).getId());*/
 
-                        db.deleteData(place_id);
+                    db.deleteData(place_id);
 
 
-                   // System.out.println("Place ID-->" + arr_list.get(1).getId());
 
 
                    // DatabaseCreate.AppDatabase.getAppDatabase(this).userDao().delete(databasePojo);
@@ -564,10 +654,13 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
         mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
 
         //move map camera
-        if (isZoomSet == false) {
+        if (isZoomSet) {
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
             // mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(16), 3000, null);
-            isZoomSet = true;
+
+           /* mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(latitude, longitude), 5.0f));*/
+            isZoomSet = false;
         }
 
 
@@ -611,6 +704,128 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
                 mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney,12));
             }
         });*/
+    }
+
+
+
+    private class connectAsyncTask extends AsyncTask<Void, Void, Void> {
+      //  private ProgressDialog progressDialog;
+        @Override
+        protected void onPreExecute() {
+            // TODO Auto-generated method stub
+            super.onPreExecute();
+           /* progressDialog = new ProgressDialog(Place_details.this);
+            progressDialog.setMessage("Fetching route, Please wait...");
+            progressDialog.setIndeterminate(true);
+            progressDialog.show();*/
+        }
+        @Override
+        protected Void doInBackground(Void... params) {
+            // TODO Auto-generated method stub
+            fetchData();
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if(doc!=null){
+                NodeList _nodelist = doc.getElementsByTagName("status");
+                Node node1 = _nodelist.item(0);
+                String _status1  = node1.getChildNodes().item(0).getNodeValue();
+                if(_status1.equalsIgnoreCase("OK")){
+                   // Toast.makeText(Place_details.this,"OK" , 1000).show();
+                    NodeList _nodelist_path = doc.getElementsByTagName("overview_polyline");
+                    Node node_path = _nodelist_path.item(0);
+                    Element _status_path = (Element)node_path;
+                    NodeList _nodelist_destination_path = _status_path.getElementsByTagName("points");
+                    Node _nodelist_dest = _nodelist_destination_path.item(0);
+                    String _path  = _nodelist_dest.getChildNodes().item(0).getNodeValue();
+                    List<LatLng> points = decodePoly(_path);
+                    for (int i = 0; i < points.size() - 1; i++) {
+                        LatLng src = points.get(i);
+                        LatLng dest = points.get(i + 1);
+                        // Polyline to display the routes
+                        Polyline line = mGoogleMap.addPolyline(new PolylineOptions()
+                                .add(new LatLng(src.latitude, src.longitude),
+                                        new LatLng(dest.latitude,dest.longitude))
+                                .width(5).color(Color.BLUE).geodesic(true));
+                    }
+                    progressDialog.dismiss();
+                }else{
+                    // Unable to find route
+                }
+            }else{
+                // Unable to find route
+            }
+        }
+    }
+
+
+    private List<LatLng> decodePoly(String encoded) {
+        List<LatLng> poly = new ArrayList<LatLng>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+            LatLng p = new LatLng((((double) lat / 1E5)), (((double) lng / 1E5)));
+            poly.add(p);
+        }
+        return poly;
+    }
+    Document doc = null;
+    private void fetchData()
+    {
+        StringBuilder urlString = new StringBuilder();
+        urlString.append("http://maps.google.com/maps/api/directions/xml?origin=");
+        urlString.append( Double.toString(latitude));
+        urlString.append(",");
+        urlString.append( Double.toString(longitude));
+        urlString.append("&destination=");//to
+        urlString.append( Double.toString(getlet));
+        urlString.append(",");
+        urlString.append( Double.toString(getlong));
+        urlString.append("&sensor=true&mode=walking");
+        Log.d("url","::"+urlString.toString());
+        HttpURLConnection urlConnection= null;
+        URL url = null;
+        try
+        {
+            url = new URL(urlString.toString());
+            urlConnection=(HttpURLConnection)url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.connect();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            doc = (Document) db.parse(urlConnection.getInputStream());//Util.XMLfromString(response);
+        }catch (MalformedURLException e){
+            e.printStackTrace();
+        }catch (IOException e){
+            e.printStackTrace();
+        }catch (ParserConfigurationException e){
+            e.printStackTrace();
+        }
+        catch (SAXException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 

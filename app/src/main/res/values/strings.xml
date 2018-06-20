@@ -22,6 +22,7 @@
 
     <string name="location_icon">Location Icon</string>
 
+    <string name="google_direction_api_key">AIzaSyCjSeYdXABMwJkwIt6s7WMF9I0Kc5mh5kE</string>
 
 
     <string name="interstitial_full_screen">ca-app-pub-7796828333997958/537613893</string>
