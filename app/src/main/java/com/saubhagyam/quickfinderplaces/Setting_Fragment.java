@@ -133,6 +133,11 @@ public class Setting_Fragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        MyApplication.getInstance().trackScreenView("Setting Screen");
+    }
 
     @Override
     public void onClick(View v) {

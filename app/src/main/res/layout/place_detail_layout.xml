@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
+    
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -63,7 +63,6 @@
 
 
             <LinearLayout
-                android:id="@+id/location_phone_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -90,7 +89,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/location_website_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -104,7 +102,6 @@
                     android:src="@drawable/ic_public_white" />
 
                 <TextView
-                    android:id="@+id/textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
@@ -119,7 +116,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/location_favourite_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -348,6 +344,15 @@
     <include layout="@layout/reviewdata_btn"/>
 
     <include layout="@layout/reviewdata_recycler"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab4"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        />
 
 
 

@@ -18,15 +18,20 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -80,7 +85,7 @@ import dmax.dialog.SpotsDialog;
 public class Category_Activity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener,ConnectivityReceiver.ConnectivityReceiverListener {
 
     private AdView adView;
     private AdRequest adRequest;
@@ -127,10 +132,18 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.category_activity);
 
+        // Manually checking internet connection
+        checkConnection();
+
         handler=new Handler();
-        // create our manager instance after the content view is set
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window w = getWindow(); // in Activity's onCreate() for instance
+            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        }
+   /*     // create our manager instance after the content view is set
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         // enable status bar tint
         tintManager.setStatusBarTintEnabled(true);
@@ -140,7 +153,7 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
         progressDialog = new SpotsDialog(Category_Activity.this, R.style.Custom);
 // set a custom tint color for all system bars
         tintManager.setTintColor(Color.parseColor("#E57200"));
-
+*/
 
         bundle = getIntent().getExtras();
 
@@ -249,6 +262,46 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
         //Intent intent=getIntent();
 
 
+    }
+
+    // Method to manually check connection status
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showSnack(isConnected);
+    }
+
+    // Showing the status in Snackbar
+    private void showSnack(boolean isConnected) {
+        String message;
+        int color;
+        if (!isConnected) {
+            message = "Sorry! Not connected to internet";
+            color = Color.RED;
+            Snackbar snackbar = Snackbar
+                    .make(findViewById(R.id.fab2), message, Snackbar.LENGTH_LONG);
+
+            View sbView = snackbar.getView();
+            TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(color);
+            snackbar.show();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register connection status listener
+        MyApplication.getInstance().setConnectivityListener(this);
+    }
+
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
     }
 
 
@@ -441,10 +494,10 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
-                new AlertDialog.Builder(Category_Activity.this)
-                        .setTitle("Location Permission Needed")
-                        .setMessage("This app needs the Location permission, please accept to use location functionality")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+               /* new AlertDialog.Builder(Category_Activity.this)
+                        .setTitle(Html.fromHtml("\"<b>\"+<font color='#000000'>Location Permission Needed</font>" + "</b>"))
+                        .setMessage("      This app needs the Location permission, please accept to use location functionality")
+                        .setPositiveButton(Html.fromHtml("Ok"), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 //Prompt the user once explanation has been shown
@@ -454,7 +507,9 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
                             }
                         })
                         .create()
-                        .show();
+                        .show();*/
+
+                createDialog(Category_Activity.this);
 
 
             } else {
@@ -464,6 +519,30 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
                         MY_PERMISSIONS_REQUEST_LOCATION);
             }
         }
+    }
+
+    public void createDialog(final Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(Html.fromHtml("\"<b>\"+<font color='#000000'>Location Permission Needed</font>" + "</b>"));
+        builder.setMessage("This app needs the Location permission, please accept to use location functionality");
+        builder.setCancelable(false);
+
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                //Prompt the user once explanation has been shown
+                ActivityCompat.requestPermissions(Category_Activity.this,
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+        Button nbutton = alert.getButton(DialogInterface.BUTTON_NEGATIVE);
+        nbutton.setBackgroundColor(Color.MAGENTA);
+        Button pbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
+        pbutton.setBackgroundColor(Color.BLACK);
     }
 
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {

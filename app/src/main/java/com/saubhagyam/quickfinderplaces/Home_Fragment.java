@@ -92,6 +92,11 @@ public class Home_Fragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        MyApplication.getInstance().trackScreenView("Home Screen");
+    }
 
     private class MyOnClickListener implements View.OnClickListener {
 

@@ -7,8 +7,8 @@ android {
         applicationId "com.saubhagyam.quickfinderplaces"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 5
-        versionName "2"
+        versionCode 8
+        versionName "2.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -17,7 +17,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-   /* buildTypes {
+    /* buildTypes {
         release {
             debuggable false
             minifyEnabled true
@@ -43,6 +43,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.1'
+    implementation 'com.google.firebase:firebase-core:11.8.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -75,16 +76,27 @@ dependencies {
 
     implementation 'com.readystatesoftware.systembartint:systembartint:1.0.3'
 
-    implementation 'com.github.jd-alexander:library:1.1.0'
+   // implementation 'com.github.jd-alexander:library:1.1.0'
 
     implementation 'com.github.d-max:spots-dialog:0.4@aar'
 
     implementation 'org.slf4j:slf4j-nop:1.7.25'
 
+
+
     // butter knife
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
+/*    //layout view for all devices
+    implementation 'com.ssomai:android.scalablelayout:2.1.6'*/
+
+    //Google analytics
+    implementation 'com.google.android.gms:play-services-analytics:9.0.0'
+
 
 
 }
+apply plugin: 'com.google.gms.google-services'
+
+

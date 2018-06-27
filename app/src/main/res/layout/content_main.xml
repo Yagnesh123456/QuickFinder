@@ -24,7 +24,7 @@
 
             <Button
                 android:id="@+id/title_bar_left_menu"
-                android:layout_width="40dp"
+                android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="left|center_vertical"
                 android:layout_marginLeft="10dp"

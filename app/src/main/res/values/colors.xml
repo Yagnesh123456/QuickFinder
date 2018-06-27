@@ -4,9 +4,7 @@
    <color name="colorPrimary_black">#E57200</color>
     <color name="colorPrimaryDark">#E57200</color>
     <color name="colorAccent">#E57200</color>
-    <color name="colorButton">#ea7e7e</color>
     <color name="colorWhite">#fff</color>
-    <color name="website_blue">#61b3df</color>
     <color name="text_color_white">#fffdfd</color>
 
    <color name="rating_Color">#e4b565</color>

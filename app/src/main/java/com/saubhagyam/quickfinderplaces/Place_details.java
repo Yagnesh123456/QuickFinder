@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +24,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -88,7 +91,7 @@ import dmax.dialog.SpotsDialog;
 public class Place_details extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener,ConnectivityReceiver.ConnectivityReceiverListener {
 
     @BindView(R.id.btn_bottom_sheet)
     Button btnBottomSheet;
@@ -143,7 +146,23 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+      /* //hide status bar
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);*/
+
+
+        // for status bar and oreo system display button background color
+        
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+
         setContentView(R.layout.place_detail_layout);
+
+        // Manually checking internet connection
+        checkConnection();
+
         ButterKnife.bind(this);
 
         sheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
@@ -152,6 +171,8 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
          * bottom sheet state change listener
          * we are changing button text when sheet changed state
          * */
+
+
         sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -180,6 +201,8 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 
             }
+
+
         });
 
         handler = new Handler();
@@ -308,18 +331,55 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
 
     }
 
+    // Method to manually check connection status
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showSnack(isConnected);
+    }
+
+    // Showing the status in Snackbar
+    private void showSnack(boolean isConnected) {
+        String message;
+        int color;
+        if (!isConnected) {
+            message = "Sorry! Not connected to internet";
+            color = Color.RED;
+            Snackbar snackbar = Snackbar
+                    .make(findViewById(R.id.fab4), message, Snackbar.LENGTH_LONG);
+
+            View sbView = snackbar.getView();
+            TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(color);
+            snackbar.show();
+        }
+    }
+
+
+
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
+    }
+
     /**
      * manually opening / closing bottom sheet on button click
      */
     @OnClick(R.id.btn_bottom_sheet)
     public void toggleBottomSheet() {
-        if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            btnBottomSheet.setText("Close");
-        } else {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            btnBottomSheet.setText("View Review");
-        }
+
+
+            if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                btnBottomSheet.setText("Close");
+            } else {
+                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                btnBottomSheet.setText("View Review");
+
+            }
     }
 
 
@@ -363,6 +423,7 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onResume() {
         super.onResume();
+        MyApplication.getInstance().setConnectivityListener(this);
         progressDialog = new SpotsDialog(Place_details.this, R.style.Custom);
         Log.e("TAG", "onResume: " );
     }
@@ -402,13 +463,19 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
                     try {
                         JSONArray review_arry = result.getJSONArray("reviews");
                         review_adapter = new Review_Adapter(Place_details.this, review_arry);
-
+                       // Log.e("TAG", "Array length: "+review_arry.length() );
                         review_adapter.notifyDataSetChanged();
+                      //  Toast.makeText(Place_details.this, review_arry.length(), Toast.LENGTH_SHORT).show();
 
                         recyclerView.setAdapter(review_adapter);
 
                         Log.e("SIZE", arr_list.size() + "");
                         // review = review_arry.getString();
+
+ /*                       if(review_arry.length() < 1)
+                        {
+                            btnBottomSheet.setVisibility(View.GONE);
+                        }*/
 
                     } catch (Exception e) {
 
@@ -545,24 +612,45 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
 
         switch (view.getId()) {
             case R.id.location_website_icon: {
-                Intent viewIntent =
-                        new Intent("android.intent.action.VIEW",
-                                Uri.parse(website));
-                startActivity(viewIntent);
-                break;
+                if(website==null ||website.isEmpty() || website.equals(" ")|| website.equals(""))
+                {
+                    Toast.makeText(this, "No WebSite Found", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                else
+                {
+                    Intent viewIntent =
+                            new Intent("android.intent.action.VIEW",
+                                    Uri.parse(website));
+                    startActivity(viewIntent);
+                    break;
+                }
+
+
             }
 
             case R.id.location_phone_icon: {
-                //  Toast.makeText(getApplicationContext(), "Phone" + formatted_phone_number, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Intent.ACTION_DIAL);
-                intent.setData(Uri.parse("tel:" + formatted_phone_number));
-                startActivity(intent);
-                break;
+
+                if(formatted_phone_number==null ||formatted_phone_number.isEmpty() || formatted_phone_number.equals(" ")|| formatted_phone_number.equals(""))
+                {
+                    Toast.makeText(this, "No Number Found", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                else {
+                    //  Toast.makeText(getApplicationContext(), "Phone" + formatted_phone_number, Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    intent.setData(Uri.parse("tel:" + formatted_phone_number));
+                    startActivity(intent);
+                    break;
+                }
             }
             case R.id.location_favourite_icon: {
                 databasePojo = new DatabasePojo();
 
                 if (showingFirst == true) {
+                    // Tracking Event
+                    MyApplication.getInstance().trackEvent("Details", "Like", "Quick Finder");
+
                     location_favourite_icon.setImageResource(R.drawable.ic_fav_imageasset_black);
                     new Thread(new Runnable() {
                         @Override
@@ -634,27 +722,32 @@ public class Place_details extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onLocationChanged(Location location) {
-        mLastLocation = location;
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
-        }
 
-        //Place current location marker
-        latLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-        getDetailOfPlace();
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_imageasset_black);
-
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("Current Position");
-        markerOptions.icon(icon);
-        mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
 
         //move map camera
         if (isZoomSet) {
+            mLastLocation = location;
+
+            if (mCurrLocationMarker != null) {
+                mCurrLocationMarker.remove();
+            }
+
+            //Place current location marker
+            latLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            getDetailOfPlace();
+
+
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marker_imageasset_black);
+
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title("Current Position");
+            markerOptions.icon(icon);
+            mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
+
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
             // mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(16), 3000, null);
 
