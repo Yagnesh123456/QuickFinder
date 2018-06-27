@@ -138,12 +138,12 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
         // Manually checking internet connection
         checkConnection();
 
-        handler=new Handler();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      handler=new Handler();
+       /*   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             Window w = getWindow(); // in Activity's onCreate() for instance
             w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
-   /*     // create our manager instance after the content view is set
+        }*/
+        // create our manager instance after the content view is set
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         // enable status bar tint
         tintManager.setStatusBarTintEnabled(true);
@@ -153,7 +153,6 @@ public class Category_Activity extends AppCompatActivity implements OnMapReadyCa
         progressDialog = new SpotsDialog(Category_Activity.this, R.style.Custom);
 // set a custom tint color for all system bars
         tintManager.setTintColor(Color.parseColor("#E57200"));
-*/
 
         bundle = getIntent().getExtras();
 
